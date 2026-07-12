@@ -46,6 +46,125 @@
 //////////////////////////////////////////////////////////////////
 
 // Interfaces are implemented implicitly
+// package main
+
+// import "fmt"
+
+// type I interface {
+// 	M()
+// }
+
+// type T struct {
+// 	S string
+// }
+
+// // This method means type T implements the interface I,
+// // but we don't need to explicitly declare that it does so.
+// func (t T) M() {
+// 	fmt.Println(t.S)
+// }
+
+// func main() {
+// 	var i I = T{"hello"}
+// 	i.M()
+// }
+
+// NOTE: In Go, interfaces are implemented implicitly. This means that if a type has methods that match the method signatures of an interface, it automatically implements that interface without needing to explicitly declare it. In this example, type T has a method M(), which matches the method signature of interface I, so T implements I.
+
+////////////////////////////////////////////////////////////////
+
+//Interface values
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"math"
+// )
+
+// type I interface {
+// 	M()
+// }
+
+// type T struct {
+// 	S string
+// }
+
+// func (t *T) M() {
+// 	fmt.Println(t.S)
+// }
+
+// type F float64
+
+// func (f F) M() {
+// 	fmt.Println(f)
+// }
+
+// func main() {
+// 	var i I
+
+// 	i = &T{"Hello"}
+// 	describe(i)
+// 	i.M()
+
+// 	i = F(math.Pi)
+// 	describe(i)
+// 	i.M()
+// }
+
+// func describe(i I) {
+// 	fmt.Printf("(%v, %T)\n", i, i)
+// }
+
+// NOTE: Under the hood, an interface value is represented as a tuple of a value and a concrete type. In this example, the interface I can hold values of different types (like *T and F) as long as they implement the method M(). The describe function prints the underlying value and its type, demonstrating how interface values can hold different concrete types.
+
+/////////////////////////////////////////////////////////////////
+
+// Interface values with nil underlying values
+
+// package main
+
+// import "fmt"
+
+// type I interface {
+// 	M()
+// }
+
+// type T struct {
+// 	S string
+// }
+
+// func (t *T) M() {
+// 	if t == nil {
+// 		fmt.Println("<nil>")
+// 		return
+// 	}
+// 	fmt.Println(t.S)
+// }
+
+// func main() {
+// 	var i I
+
+// 	var t *T
+// 	i = t
+// 	describe(i)
+// 	i.M()
+
+// 	i = &T{"hello"}
+// 	describe(i)
+// 	i.M()
+// }
+
+// func describe(i I) {
+// 	fmt.Printf("(%v, %T)\n", i, i)
+// }
+
+// NOTE: If the concrete value inside an interface is nil, the interface itself is not nil. In this example, when we assign a nil pointer of type *T to the interface I, the interface holds a concrete type (*T) and a nil value. Therefore, the interface is not nil, and calling the method M() on it will still invoke the method, which checks for nil and prints "<nil>".
+
+////////////////////////////////////////////////////////////////
+
+// Nil interface values
+
 package main
 
 import "fmt"
@@ -54,19 +173,13 @@ type I interface {
 	M()
 }
 
-type T struct {
-	S string
-}
-
-// This method means type T implements the interface I,
-// but we don't need to explicitly declare that it does so.
-func (t T) M() {
-	fmt.Println(t.S)
-}
-
 func main() {
-	var i I = T{"hello"}
+	var i I
+	describe(i)
 	i.M()
 }
 
-// NOTE: In Go, interfaces are implemented implicitly. This means that if a type has methods that match the method signatures of an interface, it automatically implements that interface without needing to explicitly declare it. In this example, type T has a method M(), which matches the method signature of interface I, so T implements I.
+func describe(i I) {
+	fmt.Printf("(%v, %T)\n", i, i)
+}
+ // NOTE: A nil interface value holds neither a value nor a concrete type. In this example, the variable i of type I is declared but not assigned any value, so it is nil. When we call describe(i), it prints that the value is nil and the type is <nil>. Attempting to call a method on a nil interface will result in a runtime panic because there is no concrete type to invoke the method on.
