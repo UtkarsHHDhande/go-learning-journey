@@ -165,21 +165,72 @@
 
 // Nil interface values
 
+// package main
+
+// import "fmt"
+
+// type I interface {
+// 	M()
+// }
+
+// func main() {
+// 	var i I
+// 	describe(i)
+// 	i.M()
+// }
+
+// func describe(i I) {
+// 	fmt.Printf("(%v, %T)\n", i, i)
+// }
+ // NOTE: A nil interface value holds neither a value nor a concrete type. In this example, the variable i of type I is declared but not assigned any value, so it is nil. When we call describe(i), it prints that the value is nil and the type is <nil>. Attempting to call a method on a nil interface will result in a runtime panic because there is no concrete type to invoke the method on.
+
+ ////////////////////////////////////////////////////////////////////
+
+// The empty interface
+
+// package main
+
+// import "fmt"
+
+// func main() {
+// 	var i interface{}
+// 	describe(i)
+
+// 	i = 42
+// 	describe(i)
+
+// 	i = "hello"
+// 	describe(i)
+// }
+
+// func describe(i interface{}) {
+// 	fmt.Printf("(%v, %T)\n", i, i)
+// }
+
+// NOTE: The empty interface, written as interface{}, can hold values of any type. In this example, the variable i is first nil, then assigned an integer value (42), and finally assigned a string value ("hello"). The describe function prints the underlying value and its type for each assignment, demonstrating the flexibility of the empty interface in Go.
+
+/////////////////////////////////////////////////////////////////
+
+// Type assertions
+
 package main
 
 import "fmt"
 
-type I interface {
-	M()
-}
-
 func main() {
-	var i I
-	describe(i)
-	i.M()
+	var i interface{} = "hello"
+
+	s := i.(string)
+	fmt.Println(s)
+
+	s, ok := i.(string)
+	fmt.Println(s, ok)
+
+	f, ok := i.(float64)
+	fmt.Println(f, ok)
+
+	f = i.(float64) // panic
+	fmt.Println(f)
 }
 
-func describe(i I) {
-	fmt.Printf("(%v, %T)\n", i, i)
-}
- // NOTE: A nil interface value holds neither a value nor a concrete type. In this example, the variable i of type I is declared but not assigned any value, so it is nil. When we call describe(i), it prints that the value is nil and the type is <nil>. Attempting to call a method on a nil interface will result in a runtime panic because there is no concrete type to invoke the method on.
+// NOTE: A type assertion provides access to an interface's underlying concrete value. In this example, we assert that the interface i holds a string value. The first assertion succeeds and prints "hello". The second assertion uses the "comma ok" idiom to safely check if the assertion is valid, returning true for the string and false for the float64. The last line attempts to assert a float64 from i, which causes a panic because i does not hold a float64 value.
