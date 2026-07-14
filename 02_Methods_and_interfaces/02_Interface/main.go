@@ -213,24 +213,109 @@
 
 // Type assertions
 
+// package main
+
+// import "fmt"
+
+// func main() {
+// 	var i interface{} = "hello"
+
+// 	s := i.(string)
+// 	fmt.Println(s)
+
+// 	s, ok := i.(string)
+// 	fmt.Println(s, ok)
+
+// 	f, ok := i.(float64)
+// 	fmt.Println(f, ok)
+
+// 	f = i.(float64) // panic
+// 	fmt.Println(f)
+// }
+
+// NOTE: A type assertion provides access to an interface's underlying concrete value. In this example, we assert that the interface i holds a string value. The first assertion succeeds and prints "hello". The second assertion uses the "comma ok" idiom to safely check if the assertion is valid, returning true for the string and false for the float64. The last line attempts to assert a float64 from i, which causes a panic because i does not hold a float64 value.
+
+/////////////////////////////////////////////////////////////////
+
+// Type switches
+
+// package main
+
+// import "fmt"
+
+// func do(i interface{}) {
+// 	switch v := i.(type) {
+// 	case int:
+// 		fmt.Printf("Twice %v is %v\n", v, v*2)
+// 	case string:
+// 		fmt.Printf("%q is %v bytes long\n", v, len(v))
+// 	default:
+// 		fmt.Printf("I don't know about type %T!\n", v)
+// 	}
+// }
+
+// func main() {
+// 	do(21)
+// 	do("hello")
+// 	do(true)
+// }
+
+// NOTE: A type switch is a construct that allows you to compare the dynamic type of an interface value against multiple types. In this example, the function do takes an empty interface as an argument and uses a type switch to determine the underlying type of the value. Depending on whether the value is an int, string, or some other type, it executes different code blocks. The default case handles any types that are not explicitly matched in the switch cases.
+
+/////////////////////////////////////////////////////////
+
+//Stringers
+
+// package main
+
+// import "fmt"
+
+// type Person struct {
+// 	Name string
+// 	Age  int
+// }
+
+// func (p Person) String() string {
+// 	return fmt.Sprintf("%v (%v years)", p.Name, p.Age)
+// }
+
+// func main() {
+// 	a := Person{"Arthur Dent", 42}
+// 	z := Person{"Zaphod Beeblebrox", 9001}
+// 	fmt.Println(a, z)
+// }
+
+//NOTE: One of the most ubiquitous interfaces is Stringer defined by the fmt package.
+// type Stringer interface {
+//     String() string
+// }
+// A Stringer is a type that can describe itself as a string. The fmt package (and many others) look for this interface to print values.
+
+///////////////////////////////////////////////////////////
+
+// Exercise: Stringers
+
+//Make the IPAddr type implement fmt.Stringer to print the address as a dotted quad.
+
+// For instance, IPAddr{1, 2, 3, 4} should print as "1.2.3.4".
+
 package main
 
 import "fmt"
 
-func main() {
-	var i interface{} = "hello"
+type IPAddr [4]byte
 
-	s := i.(string)
-	fmt.Println(s)
-
-	s, ok := i.(string)
-	fmt.Println(s, ok)
-
-	f, ok := i.(float64)
-	fmt.Println(f, ok)
-
-	f = i.(float64) // panic
-	fmt.Println(f)
+// Implement the Stringer interface
+func (ip IPAddr) String() string {
+	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
 }
 
-// NOTE: A type assertion provides access to an interface's underlying concrete value. In this example, we assert that the interface i holds a string value. The first assertion succeeds and prints "hello". The second assertion uses the "comma ok" idiom to safely check if the assertion is valid, returning true for the string and false for the float64. The last line attempts to assert a float64 from i, which causes a panic because i does not hold a float64 value.
+func main() {
+	hosts := map[string]IPAddr{
+		"loopback":  {127, 0, 0, 1},
+		"googleDNS": {8, 8, 8, 8},
+	}
+	for name, ip := range hosts {
+		fmt.Printf("%v: %v\n", name, ip)
+	}
+}
