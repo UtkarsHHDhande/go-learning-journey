@@ -299,23 +299,105 @@
 
 // For instance, IPAddr{1, 2, 3, 4} should print as "1.2.3.4".
 
+// package main
+
+// import "fmt"
+
+// type IPAddr [4]byte
+
+// // Implement the Stringer interface
+// func (ip IPAddr) String() string {
+// 	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
+// }
+
+// func main() {
+// 	hosts := map[string]IPAddr{
+// 		"loopback":  {127, 0, 0, 1},
+// 		"googleDNS": {8, 8, 8, 8},
+// 	}
+// 	for name, ip := range hosts {
+// 		fmt.Printf("%v: %v\n", name, ip)
+// 	}
+// }
+
+/////////////////////////////////////////////////////////////
+
+// Errors
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"time"
+// )
+
+// type MyError struct {
+// 	When time.Time
+// 	What string
+// }
+
+// func (e *MyError) Error() string {
+// 	return fmt.Sprintf("at %v, %s",
+// 		e.When, e.What)
+// }
+
+// func run() error {
+// 	return &MyError{
+// 		time.Now(),
+// 		"it didn't work",
+// 	}
+// }
+
+// func main() {
+// 	if err := run(); err != nil {
+// 		fmt.Println(err)
+// 	}
+// }
+
+// NOTE: The error type is a built-in interface similar to fmt.Stringer. The error interface type is implemented by any value that has an Error() string method. In this example, MyError implements the error interface by defining the Error() method, allowing it to be used as an error value. The run function returns a pointer to a MyError instance, and in main, we check for an error and print it if it exists.
+
+//////////////////////////////////////////////////////////////
+
+//Exercise: Errors
+
+// Copy your Sqrt function from the earlier exercise and modify it to return an error value.
+
+// Sqrt should return a non-nil error value when given a negative number, as it doesn't support complex numbers.
+
+// Create a new type
+
+// type ErrNegativeSqrt float64
+// and make it an error by giving it a
+
+// func (e ErrNegativeSqrt) Error() string
+// method such that ErrNegativeSqrt(-2).Error() returns "cannot Sqrt negative number: -2".
+
+// Note: A call to fmt.Sprint(e) inside the Error method will send the program into an infinite loop. You can avoid this by converting e first: fmt.Sprint(float64(e)). Why?
+
+// Change your Sqrt function to return an ErrNegativeSqrt value when given a negative number.
+
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
-type IPAddr [4]byte
+type ErrNegativeSqrt float64
 
-// Implement the Stringer interface
-func (ip IPAddr) String() string {
-	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
+// Implement the Error() method
+func (e ErrNegativeSqrt) Error() string {
+	return fmt.Sprintf("cannot Sqrt negative number: %g", float64(e))
+}
+
+func Sqrt(x float64) (float64, error) {
+	if x < 0 {
+		return 0, ErrNegativeSqrt(x)
+	}
+	return math.Sqrt(x), nil
 }
 
 func main() {
-	hosts := map[string]IPAddr{
-		"loopback":  {127, 0, 0, 1},
-		"googleDNS": {8, 8, 8, 8},
-	}
-	for name, ip := range hosts {
-		fmt.Printf("%v: %v\n", name, ip)
-	}
+	fmt.Println(Sqrt(2))
+	fmt.Println(Sqrt(-2))
 }
