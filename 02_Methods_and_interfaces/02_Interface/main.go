@@ -376,28 +376,81 @@
 
 // Change your Sqrt function to return an ErrNegativeSqrt value when given a negative number.
 
+// package main
+
+// import (
+// 	"fmt"
+// 	"math"
+// )
+
+// type ErrNegativeSqrt float64
+
+// // Implement the Error() method
+// func (e ErrNegativeSqrt) Error() string {
+// 	return fmt.Sprintf("cannot Sqrt negative number: %g", float64(e))
+// }
+
+// func Sqrt(x float64) (float64, error) {
+// 	if x < 0 {
+// 		return 0, ErrNegativeSqrt(x)
+// 	}
+// 	return math.Sqrt(x), nil
+// }
+
+// func main() {
+// 	fmt.Println(Sqrt(2))
+// 	fmt.Println(Sqrt(-2))
+// }
+
+////////////////////////////////////////////////////////////////////
+
+//Readers
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"io"
+// 	"strings"
+// )
+
+// func main() {
+// 	r := strings.NewReader("Hello, Reader!")
+
+// 	b := make([]byte, 8)
+// 	for {
+// 		n, err := r.Read(b)
+// 		fmt.Printf("n = %v err = %v b = %v\n", n, err, b)
+// 		fmt.Printf("b[:n] = %q\n", b[:n])
+// 		if err == io.EOF {
+// 			break
+// 		}
+// 	}
+// }
+
+// NOTE: The io package specifies the io.Reader interface, which wraps the basic Read method. The strings.NewReader function returns a new Reader reading from the provided string. In this example, we read from the string in chunks of 8 bytes, printing the number of bytes read, any error encountered, and the contents of the buffer. When the end of the string is reached, io.EOF is returned to indicate that there is no more data to read.
+
+//////////////////////////////////////////////////////////////////////
+
+//Exercise: Readers
+
+//Implement a Reader type that emits an infinite stream of the ASCII character 'A'.
+
 package main
 
 import (
-	"fmt"
-	"math"
+	"golang.org/x/tour/reader"
 )
 
-type ErrNegativeSqrt float64
+type MyReader struct{}
 
-// Implement the Error() method
-func (e ErrNegativeSqrt) Error() string {
-	return fmt.Sprintf("cannot Sqrt negative number: %g", float64(e))
-}
-
-func Sqrt(x float64) (float64, error) {
-	if x < 0 {
-		return 0, ErrNegativeSqrt(x)
+func (MyReader) Read(b []byte) (int, error) {
+	for i := range b {
+		b[i] = 'A'
 	}
-	return math.Sqrt(x), nil
+	return len(b), nil
 }
 
 func main() {
-	fmt.Println(Sqrt(2))
-	fmt.Println(Sqrt(-2))
+	reader.Validate(MyReader{})
 }
