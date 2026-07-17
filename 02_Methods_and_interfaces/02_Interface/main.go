@@ -436,21 +436,66 @@
 
 //Implement a Reader type that emits an infinite stream of the ASCII character 'A'.
 
+// package main
+
+// import (
+// 	"golang.org/x/tour/reader"
+// )
+
+// type MyReader struct{}
+
+// func (MyReader) Read(b []byte) (int, error) {
+// 	for i := range b {
+// 		b[i] = 'A'
+// 	}
+// 	return len(b), nil
+// }
+
+// func main() {
+// 	reader.Validate(MyReader{})
+// }
+
+////////////////////////////////////////////////////////////////
+
+//Exercise: rot13Reader
+
+// A common pattern is an io.Reader that wraps another io.Reader, modifying the stream in some way.
+
+// For example, the gzip.NewReader function takes an io.Reader (a stream of compressed data) and returns a *gzip.Reader that also implements io.Reader (a stream of the decompressed data).
+
+// Implement a rot13Reader that implements io.Reader and reads from an io.Reader, modifying the stream by applying the rot13 substitution cipher to all alphabetical characters.
+
+// The rot13Reader type is provided for you. Make it an io.Reader by implementing its Read method.
+
 package main
 
 import (
-	"golang.org/x/tour/reader"
+	"io"
+	"os"
+	"strings"
 )
 
-type MyReader struct{}
+type rot13Reader struct {
+	r io.Reader
+}
 
-func (MyReader) Read(b []byte) (int, error) {
-	for i := range b {
-		b[i] = 'A'
+func (rr *rot13Reader) Read(p []byte) (int, error) {
+	n, err := rr.r.Read(p)
+
+	for i := 0; i < n; i++ {
+		switch {
+		case p[i] >= 'A' && p[i] <= 'Z':
+			p[i] = 'A' + (p[i]-'A'+13)%26
+		case p[i] >= 'a' && p[i] <= 'z':
+			p[i] = 'a' + (p[i]-'a'+13)%26
+		}
 	}
-	return len(b), nil
+
+	return n, err
 }
 
 func main() {
-	reader.Validate(MyReader{})
+	s := strings.NewReader("Lbh penpxrq gur pbqr!")
+	r := rot13Reader{s}
+	io.Copy(os.Stdout, &r)
 }
