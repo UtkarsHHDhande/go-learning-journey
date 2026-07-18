@@ -182,9 +182,9 @@
 // func describe(i I) {
 // 	fmt.Printf("(%v, %T)\n", i, i)
 // }
- // NOTE: A nil interface value holds neither a value nor a concrete type. In this example, the variable i of type I is declared but not assigned any value, so it is nil. When we call describe(i), it prints that the value is nil and the type is <nil>. Attempting to call a method on a nil interface will result in a runtime panic because there is no concrete type to invoke the method on.
+// NOTE: A nil interface value holds neither a value nor a concrete type. In this example, the variable i of type I is declared but not assigned any value, so it is nil. When we call describe(i), it prints that the value is nil and the type is <nil>. Attempting to call a method on a nil interface will result in a runtime panic because there is no concrete type to invoke the method on.
 
- ////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 
 // The empty interface
 
@@ -467,35 +467,97 @@
 
 // The rot13Reader type is provided for you. Make it an io.Reader by implementing its Read method.
 
+// package main
+
+// import (
+// 	"io"
+// 	"os"
+// 	"strings"
+// )
+
+// type rot13Reader struct {
+// 	r io.Reader
+// }
+
+// func (rr *rot13Reader) Read(p []byte) (int, error) {
+// 	n, err := rr.r.Read(p)
+
+// 	for i := 0; i < n; i++ {
+// 		switch {
+// 		case p[i] >= 'A' && p[i] <= 'Z':
+// 			p[i] = 'A' + (p[i]-'A'+13)%26
+// 		case p[i] >= 'a' && p[i] <= 'z':
+// 			p[i] = 'a' + (p[i]-'a'+13)%26
+// 		}
+// 	}
+
+// 	return n, err
+// }
+
+// func main() {
+// 	s := strings.NewReader("Lbh penpxrq gur pbqr!")
+// 	r := rot13Reader{s}
+// 	io.Copy(os.Stdout, &r)
+// }
+
+////////////////////////////////////////////////////////////////////////
+
+//Images
+
+// package main
+
+// import (
+// 	"fmt"
+// 	"image"
+// )
+
+// func main() {
+// 	m := image.NewRGBA(image.Rect(0, 0, 100, 100))
+// 	fmt.Println(m.Bounds())
+// 	fmt.Println(m.At(0, 0).RGBA())
+// }
+
+//NOTE: The image package defines the Image interface, which represents a rectangular grid of colors. The NewRGBA function creates a new RGBA image with the specified rectangle bounds. In this example, we create a 100x100 image and print its bounds and the color of the pixel at (0, 0) in RGBA format.
+
+/////////////////////////////////////////////////////////////////
+
+//Exercise: Images
+
+// Remember the picture generator you wrote earlier? Let's write another one, but this time it will return an implementation of image.Image instead of a slice of data.
+
+// Define your own Image type, implement the necessary methods, and call pic.ShowImage.
+
+// Bounds should return a image.Rectangle, like image.Rect(0, 0, w, h).
+
+// ColorModel should return color.RGBAModel.
+
+// At should return a color; the value v in the last picture generator corresponds to color.RGBA{v, v, 255, 255} in this one.
+
 package main
 
 import (
-	"io"
-	"os"
-	"strings"
+	"fmt"
+	"image"
+	"image/color"
 )
 
-type rot13Reader struct {
-	r io.Reader
+type Image struct{}
+
+func (Image) ColorModel() color.Model {
+	return color.RGBAModel
 }
 
-func (rr *rot13Reader) Read(p []byte) (int, error) {
-	n, err := rr.r.Read(p)
+func (Image) Bounds() image.Rectangle {
+	return image.Rect(0, 0, 256, 256)
+}
 
-	for i := 0; i < n; i++ {
-		switch {
-		case p[i] >= 'A' && p[i] <= 'Z':
-			p[i] = 'A' + (p[i]-'A'+13)%26
-		case p[i] >= 'a' && p[i] <= 'z':
-			p[i] = 'a' + (p[i]-'a'+13)%26
-		}
-	}
-
-	return n, err
+func (Image) At(x, y int) color.Color {
+	v := uint8(x ^ y) // XOR pattern
+	return color.RGBA{v, v, 255, 255}
 }
 
 func main() {
-	s := strings.NewReader("Lbh penpxrq gur pbqr!")
-	r := rot13Reader{s}
-	io.Copy(os.Stdout, &r)
+	m := Image{}
+	fmt.Println(m.Bounds())
+	fmt.Println(m.At(0, 0).RGBA())
 }
